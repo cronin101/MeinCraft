@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'yaml'
 require 'httparty'
 require 'json'
@@ -34,5 +32,3 @@ class DigitalOceanAPI
     get_droplets.select { |droplet| droplet["name"] == MASTER_NAME }[0]
   end
 end
-
-DO = DigitalOceanAPI.new
