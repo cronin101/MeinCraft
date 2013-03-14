@@ -10,13 +10,21 @@ class DigitalOceanAPI
   DROPLETS_URI = BASE_URI + '/droplets/'
   SIZES_URI = BASE_URI + '/sizes/'
   IMAGES_URI = BASE_URI + '/images/'
+  REGIONS_URI = BASE_URI + '/regions/'
 
   MASTER_NAME = 'SuicuneNouveau'
 
   def initialize
-    credentials = YAML.load_file(CONFIG)['creds']
+    load_config
+  end
+
+  def load_config
+    config = YAML.load_file(CONFIG)
+    credentials = config['creds']
     @client_key = credentials['client']
     @api_key = credentials['api']
+
+    @slave = config['slave']
   end
 
   def auth_params
@@ -26,42 +34,71 @@ class DigitalOceanAPI
     }
   end
 
-  def get_droplets
-    uri = URI.parse DROPLETS_URI
+  def get_object_from_location(object_name, location)
+    uri = URI.parse location
     uri.query = URI.encode_www_form auth_params
-    response = HTTParty.get uri
-    droplets = JSON.parse(response.body)["droplets"]
+    response = HTTParty.get uri.to_s
+    droplets = JSON.parse(response.body)[object_name]
+  end
+
+  def named_object(name, objects)
+    objects.select { |object| object['name'] == name }[0]
+  end
+
+  def get_droplets
+    get_object_from_location('droplets', DROPLETS_URI)
   end
 
   def master_droplet
-    get_droplets.select { |droplet| droplet["name"] == MASTER_NAME }[0]
+    named_object(MASTER_NAME, get_droplets)
   end
 
-  def sizes
-    uri = URI.parse SIZES_URI
-    uri.query = URI.encode_www_form auth_params
-    response = HTTParty.get uri.to_s
-    possible_sizes = JSON.parse(response.body)["sizes"]
+  def slave_droplet
+    named_object(@slave['name'], get_droplets)
   end
 
-  def images
-    uri = URI.parse IMAGES_URL
-    uri.query = URI.encode_www_form auth_params
-    response = HTTParty.get uri.to_s
-    possible_sizes = JSON.parse(response.body)["images"]
+  def get_sizes
+    get_object_from_location('sizes', SIZES_URI)
+  end
+
+  def size_called(name)
+    named_object(name, get_sizes)
+  end
+
+  def get_images
+    get_object_from_location('images', IMAGES_URI)
+  end
+
+  def image_called(name)
+    named_object(name, get_images)
+  end
+
+  def get_regions
+    get_object_from_location('regions', REGIONS_URI)
+  end
+
+  def region_called(name)
+    named_object(name, get_regions)
   end
 
   def create_slave
-    config = YAML.load_file(CONFIG)['slave']
     uri = URI.parse (DROPLETS_URI + '/new')
     params = {
-      'name' => config['name'],
-      'size_id' => config['size_id'],
-      'image_id' => config['image_id']
+      'name' => @slave['name'],
+      'size_id' => size_called(@slave['size'])['id'],
+      'image_id' => image_called(@slave['image'])['id'],
+      'region_id' => region_called(@slave['region'])['id']
     }.merge auth_params
     uri.query = URI.encode_www_form params
     response = HTTParty.get uri.to_s
     created_droplet = JSON.parse(response.body)
+  end
+
+  def destroy_slave
+    uri = URI.parse (DROPLETS_URI + "/#{slave_droplet['id']}/destroy/")
+    uri.query = URI.encode_www_form auth_params
+    response = HTTParty.get uri.to_s
+    destroyed_dropley = JSON.parse(response.body)
   end
 
 end
