@@ -1,0 +1,11 @@
+creds:
+  client: 'fake client'
+  api: 'fake api key'
+
+slave:
+  name: 'MinecraftSlave'
+  size: '2GB'
+  image: 'Slave Ready'
+  mc_ram: '1500M'
+  region: 'Amsterdam 1'
+

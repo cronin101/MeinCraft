@@ -98,7 +98,7 @@ class DigitalOceanAPI
     uri = URI.parse (DROPLETS_URI + "/#{slave_droplet['id']}/destroy/")
     uri.query = URI.encode_www_form auth_params
     response = HTTParty.get uri.to_s
-    destroyed_dropley = JSON.parse(response.body)
+    destroyed_droplet = JSON.parse(response.body)
   end
 
 end
