@@ -45,8 +45,12 @@ class DigitalOceanAPI
     objects.select { |object| object['name'] == name }[0]
   end
 
-  def get_droplets
-    get_object_from_location('droplets', DROPLETS_URI)
+  ['droplets', 'sizes', 'images', 'regions'].each do |object|
+    method_name = "get_#{object}"
+    define_method(method_name) do
+      location = self.class.const_get(object.upcase << "_URI")
+      get_object_from_location(object, location)
+    end
   end
 
   def master_droplet
@@ -57,24 +61,12 @@ class DigitalOceanAPI
     named_object(@slave['name'], get_droplets)
   end
 
-  def get_sizes
-    get_object_from_location('sizes', SIZES_URI)
-  end
-
   def size_called(name)
     named_object(name, get_sizes)
   end
 
-  def get_images
-    get_object_from_location('images', IMAGES_URI)
-  end
-
   def image_called(name)
     named_object(name, get_images)
-  end
-
-  def get_regions
-    get_object_from_location('regions', REGIONS_URI)
   end
 
   def region_called(name)
