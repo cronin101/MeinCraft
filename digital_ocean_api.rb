@@ -1,6 +1,7 @@
 require 'yaml'
 require 'httparty'
 require 'json'
+require 'uri'
 
 class DigitalOceanAPI
   CONFIG = './config.yml'
@@ -19,11 +20,16 @@ class DigitalOceanAPI
   end
 
   def auth_params
-    "client_id=#{@client_key}&api_key=#{@api_key}"
+    {
+      'client_id' => @client_key,
+      'api_key' => @api_key
+    }
   end
 
   def get_droplets
-    response = HTTParty.get(DROPLETS_URI + "?#{auth_params}")
+    uri = URI.parse DROPLETS_URI
+    uri.query = URI.encode_www_form auth_params
+    response = HTTParty.get uri
     droplets = JSON.parse(response.body)["droplets"]
   end
 
@@ -32,22 +38,30 @@ class DigitalOceanAPI
   end
 
   def sizes
-    response = HTTParty.get(SIZES_URI + "?#{auth_params}")
+    uri = URI.parse SIZES_URI
+    uri.query = URI.encode_www_form auth_params
+    response = HTTParty.get uri.to_s
     possible_sizes = JSON.parse(response.body)["sizes"]
   end
 
   def images
-    response = HTTParty.get(IMAGES_URI + "?#{auth_params}")
+    uri = URI.parse IMAGES_URL
+    uri.query = URI.encode_www_form auth_params
+    response = HTTParty.get uri.to_s
     possible_sizes = JSON.parse(response.body)["images"]
   end
 
   def create_slave
     config = YAML.load_file(CONFIG)['slave']
-    params = "/new?"
-    params << "name=#{config['name']}"
-    params << "&size_id=#{config['size_id']}"
-    params << "&image_id=#{config['image_id']
-    response = HTTParty.get(DROPLETS_URI + params + "&#{auth_params}")
+    uri = URI.parse (DROPLETS_URI + '/new')
+    params = {
+      'name' => config['name'],
+      'size_id' => config['size_id'],
+      'image_id' => config['image_id']
+    }.merge auth_params
+    uri.query = URI.encode_www_form params
+    response = HTTParty.get uri.to_s
+    created_droplet = JSON.parse(response.body)
   end
 
 end
