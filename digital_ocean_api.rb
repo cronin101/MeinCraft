@@ -51,6 +51,10 @@ class DigitalOceanAPI
       location = self.class.const_get(object.upcase << "_URI")
       get_object_from_location(object, location)
     end
+    method_name = "#{object}_called"
+    define_method(method_name) do |name|
+      named_object(name, self.send("get_#{object}"))
+    end
   end
 
   def master_droplet
@@ -59,18 +63,6 @@ class DigitalOceanAPI
 
   def slave_droplet
     named_object(@slave['name'], get_droplets)
-  end
-
-  def size_called(name)
-    named_object(name, get_sizes)
-  end
-
-  def image_called(name)
-    named_object(name, get_images)
-  end
-
-  def region_called(name)
-    named_object(name, get_regions)
   end
 
   def create_slave
