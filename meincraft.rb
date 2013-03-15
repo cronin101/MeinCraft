@@ -5,9 +5,24 @@ include GLI::App
 
 require './lib/digital_ocean_api.rb'
 require './lib/slave_driver.rb'
+require './lib/rinetd.rb'
 
 DO = DigitalOceanAPI.new
 
+def create_slave
+  DO.create_slave
+  puts "Waiting for slave creation..."
+  60.times { sleep 1; print '.'; $stdout.flush }
+  puts
+end
+
+def reset(slave)
+  sd = SlaveDriver.new(DO.slave['username'], slave['ip_address'], DO.slave['mc_ram'])
+  sd.reset_from_master
+
+  RINETD.redirect_port_to slave['ip_address']
+  RINETD.restart
+end
 
 command :this do |c|
   c.action do
@@ -31,12 +46,11 @@ command :deploy do |c|
   c.action do
     slave = DO.slave_droplet
     if slave.nil?
-     DO.create_slave
-      puts "Waiting for slave creation..."
-      60.times { sleep 1; print '.'; $stdout.flush }
-      puts
-      sd = SlaveDriver.new(DO.slave['username'], DO.slave_droplet['ip_address'], DO.slave['mc_ram'])
-      sd.reset_from_master
+      create_slave
+
+      new_slave = DO.slave_droplet
+
+      reset new_slave
     else
       puts "Slave already exists: #{slave}"
     end
@@ -49,8 +63,7 @@ command :reset do |c|
     if slave.nil?
       puts "No slave exists to reset."
     else
-      sd = SlaveDriver.new(DO.slave['username'], slave['ip_address'], DO.slave['mc_ram'])
-      sd.reset_from_master
+      reset slave
     end
   end
 end
