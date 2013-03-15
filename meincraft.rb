@@ -3,8 +3,8 @@
 require 'gli'
 include GLI::App
 
-require './digital_ocean_api.rb'
-require './slave_driver.rb'
+require './lib/digital_ocean_api.rb'
+require './lib/slave_driver.rb'
 
 DO = DigitalOceanAPI.new
 
