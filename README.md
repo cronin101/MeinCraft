@@ -7,6 +7,7 @@ All authorisation requires that you add your slavemaster's `id_rsa.pub` into the
 After setting up keys, simply tar a folder called 'server' containing minecraft_server.jar as server.tar.bz2.
 
 ### Configuring
+A simple YAML config file:
 
 ```yaml
 creds: # Visible at https://www.digitalocean.com/api_access
