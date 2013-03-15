@@ -19,16 +19,23 @@ def transfer_file_to(target, file)
   `#{command}`
 end
 
+def transfer_file_from(target, file)
+  command = "scp #{DO.slave['username']}@#{target['ip_address']}:#{file} ./"
+  puts command
+  `#{command}`
+end
 
-def kill_screens(slave)
-  puts "Closing all active screen sessions"
-  puts (perform_command_on slave, 'screen -ls | grep "Detached" | awk "{print $1}" | xargs -i screen -X -S {} quit')
+
+def kill_sessions(slave)
+  puts "Closing all java and active screen sessions"
+  perform_command_on slave, 'killall java'
+  perform_command_on slave, 'screen -ls | grep "Detached" | awk "{print $1}" | xargs -i screen -X -S {} quit'
 end
 
 def reset_from_master
   slave = DO.slave_droplet
 
-  kill_screens(slave)
+  kill_sessions(slave)
 
   puts "Clearing snapshot data..."
   perform_command_on slave, 'rm -r ~/server'
@@ -36,11 +43,25 @@ def reset_from_master
 
   puts "Restoring from latest backup..."
   transfer_file_to slave, './server.tar.bz2'
+
   puts "Extracting..."
   perform_command_on slave, 'tar -jxvf ~/server.tar.bz2'
 
   puts "Creating screen session with minecraft server..."
-  puts (perform_command_on slave, "cd server; screen -d -m 'export RAM=#{DO.slave['ram']}; ./be_server.sh'")
+  mc_ram = DO.slave['mc_ram']
+  puts (perform_command_on slave, "cd ./server; screen -dmS minecraft java -Xms#{mc_ram} -Xmx#{mc_ram} -jar minecraft_server.jar nogui")
+end
+
+def clone_from(slave)
+  puts "Compressing state into backup..."
+  perform_command_on slave, 'rm -r ~/server.tar.bz2'
+  perform_command_on slave, 'tar -jcvf ~/server.tar.bz2 ~/server'
+
+  puts "Archiving existing backup..."
+  `mv ./server.tar.bz2 ./backups/#{Time.now.to_i}-server.tar.bz2`
+
+  puts "Saving backup from slave..."
+  transfer_file_from slave, 'server.tar.bz2'
 end
 
 command :this do |c|
@@ -63,11 +84,16 @@ end
 
 command :deploy do |c|
   c.action do
-    DO.create_slave
-    puts "Waiting for slave creation..."
-    60.times { sleep 1; print '.'; $stdout.flush }
-    puts
-    reset_from_master
+    slave = DO.slave_droplet
+    if slave.nil?
+     DO.create_slave
+      puts "Waiting for slave creation..."
+      60.times { sleep 1; print '.'; $stdout.flush }
+      puts
+      reset_from_master
+    else
+      puts "Slave already exists: #{slave}"
+    end
   end
 end
 
@@ -79,7 +105,16 @@ end
 
 command :destroy do |c|
   c.action do
-    puts DO.destroy_slave.inspect
+    slave = DO.slave_droplet
+    if slave.nil?
+      puts "No slave exists to destroy."
+    else
+      kill_sessions slave
+
+      clone_from slave
+
+      puts DO.destroy_slave.inspect
+    end
   end
 end
 
