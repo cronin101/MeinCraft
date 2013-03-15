@@ -12,6 +12,8 @@ class DigitalOceanAPI
   IMAGES_URI = BASE_URI + '/images/'
   REGIONS_URI = BASE_URI + '/regions/'
 
+  RESOURCES = %w{droplets sizes images regions}
+
   MASTER_NAME = 'SuicuneNouveau'
 
   def initialize
@@ -45,7 +47,7 @@ class DigitalOceanAPI
     objects.select { |object| object['name'] == name }[0]
   end
 
-  ['droplets', 'sizes', 'images', 'regions'].each do |object|
+  RESOURCES.each do |object|
     method_name = "get_#{object}"
     define_method(method_name) do
       location = self.class.const_get(object.upcase << "_URI")
