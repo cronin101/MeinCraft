@@ -49,7 +49,7 @@ def reset_from_master
 
   puts "Creating screen session with minecraft server..."
   mc_ram = DO.slave['mc_ram']
-  puts (perform_command_on slave, "cd ./server; screen -dmS minecraft java -Xms#{mc_ram} -Xmx#{mc_ram} -jar minecraft_server.jar nogui")
+  perform_command_on slave, "cd ./server; screen -dmS minecraft java -Xms#{mc_ram} -Xmx#{mc_ram} -jar minecraft_server.jar nogui"
 end
 
 def clone_from(slave)
