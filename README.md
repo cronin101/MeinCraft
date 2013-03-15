@@ -27,7 +27,8 @@ slave:
 #### Deploying a Slave Droplet
 ```bash
 $ ./meincraft.rb deploy
-
+```
+```bash
 #Waiting for slave creation...
 #............................................................
 #Closing all java and active screen sessions
@@ -46,7 +47,8 @@ $ ./meincraft.rb deploy
 #### Destroying Slave Droplet
 ```bash
 $ ./meincraft.rb destroy
-
+```
+```bash
 #Closing all java and active screen sessions
 #ssh minecraft@198.211.126.128 'killall java'
 #ssh minecraft@198.211.126.128 'screen -ls | grep "Detached" | awk "{print $1}" | xargs -i screen -X -S {} quit'
