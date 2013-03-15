@@ -4,7 +4,7 @@
 MeinCraft uses the *DigitalOcean* API to spawn a droplet for hosting a minecraft server.
 All authorisation requires that you add your slavemaster's `id_rsa.pub` into the slave's `authorized_keys` file in the slave droplet image used.
 
-After setting up keys, simply execute minecraft_server.jar on the host then tar a folder named server containing it alongside the resultant files as server.tar.bz2.
+After setting up keys, simply tar a folder called 'server' containing minecraft_server.jar as server.tar.bz2.
 
 ### Comands
 
