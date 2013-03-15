@@ -7,7 +7,7 @@ MeinCraft uses the *DigitalOcean* API to spawn a droplet for hosting a minecraft
 
 #### Deploying a Slave Droplet
 ```bash
-$ ./mc deploy
+$ ./meincraft.rb deploy
 
 Waiting for slave creation...
 ............................................................
