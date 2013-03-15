@@ -6,6 +6,8 @@ require 'uri'
 class DigitalOceanAPI
   CONFIG = './config.yml'
 
+  attr_reader :slave
+
   BASE_URI = 'https://api.digitalocean.com'
   DROPLETS_URI = BASE_URI + '/droplets/'
   SIZES_URI = BASE_URI + '/sizes/'
