@@ -15,13 +15,13 @@ end
 
 command :sizes do |c|
   c.action do
-    puts "Available sizes: #{DO.get_sizes}"
+    puts "Available sizes: #{DO.sizes}"
   end
 end
 
 command :images do |c|
   c.action do
-    puts "Available images: #{DO.get_images}"
+    puts "Available images: #{DO.images}"
   end
 end
 

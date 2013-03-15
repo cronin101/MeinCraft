@@ -48,23 +48,23 @@ class DigitalOceanAPI
   end
 
   RESOURCES.each do |object|
-    method_name = "get_#{object}"
+    method_name = object
     define_method(method_name) do
       location = self.class.const_get(object.upcase << "_URI")
       get_object_from_location(object, location)
     end
-    method_name = "#{object}_called"
+    method_name = "#{object[0..-2]}_called"
     define_method(method_name) do |name|
-      named_object(name, self.send("get_#{object}"))
+      named_object(name, self.send(object))
     end
   end
 
   def master_droplet
-    named_object(MASTER_NAME, get_droplets)
+    named_object(MASTER_NAME, droplets)
   end
 
   def slave_droplet
-    named_object(@slave['name'], get_droplets)
+    named_object(@slave['name'], droplets)
   end
 
   def create_slave
