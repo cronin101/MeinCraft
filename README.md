@@ -2,7 +2,7 @@
 ##### Minecraft in the cloud, for mein convenience.
 
 ## Description
-With one console command you can spawn a VPS instance running Minecraft server on the latest map snapshot.
+With one console command you can spawn a VPS instance running Minecraft server with a given map folder.
 
 The default Minecraft port (25565) of the static 'master' server will then forward to the instance.
 
