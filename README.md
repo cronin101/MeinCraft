@@ -6,6 +6,21 @@ All authorisation requires that you add your slavemaster's `id_rsa.pub` into the
 
 After setting up keys, simply tar a folder called 'server' containing minecraft_server.jar as server.tar.bz2.
 
+### Configuring
+
+```yaml
+creds: # Visible at https://www.digitalocean.com/api_access
+  client: 'fake client'
+  api: 'fake api key'
+
+slave:
+  name: 'MinecraftSlave'
+  size: '2GB' # Droplet size, see: https://www.digitalocean.com/pricing
+  image: 'Slave Ready' # This image must have java installed and public keys added.
+  mc_ram: '1500M' # The amount of RAM to set the JVM heap as.
+  region: 'Amsterdam 1'
+```
+
 ### Comands
 
 #### Deploying a Slave Droplet
