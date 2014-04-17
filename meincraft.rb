@@ -11,7 +11,7 @@ DO = DigitalOceanAPI.new
 
 def create_slave
   DO.create_slave
-  puts "Waiting for slave creation..."
+  puts 'Waiting for slave creation...'
   60.times { sleep 1; print '.'; $stdout.flush }
   puts
 end
@@ -61,7 +61,7 @@ command :reset do |c|
   c.action do
     slave = DO.slave_droplet
     if slave.nil?
-      puts "No slave exists to reset."
+      puts 'No slave exists to reset.'
     else
       reset slave
     end
@@ -72,7 +72,7 @@ command :destroy do |c|
   c.action do
     slave = DO.slave_droplet
     if slave.nil?
-      puts "No slave exists to destroy."
+      puts 'No slave exists to destroy.'
     else
       sd = SlaveDriver.new(DO.slave['username'], slave['ip_address'])
 
@@ -89,7 +89,7 @@ command :clone do |c|
   c.action do
     slave = DO.slave_droplet
     if slave.nil?
-      puts "No slave exists to clone."
+      puts 'No slave exists to clone.'
     else
       sd = SlaveDriver.new(DO.slave['username'], slave['ip_address'])
 
@@ -104,7 +104,7 @@ command :slave do |c|
   c.action do
     slave = DO.slave_droplet
     if slave.nil?
-      puts "No slave exists."
+      puts 'No slave exists.'
     else
       puts slave.inspect
     end

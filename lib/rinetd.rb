@@ -13,5 +13,4 @@ class RINETD
   def self.restart
     puts `sudo /etc/init.d/rinetd restart`
   end
-
 end

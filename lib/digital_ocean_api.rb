@@ -14,7 +14,7 @@ class DigitalOceanAPI
   IMAGES_URI = BASE_URI + '/images/'
   REGIONS_URI = BASE_URI + '/regions/'
 
-  RESOURCES = %w{droplets sizes images regions}
+  RESOURCES = %w(droplets sizes images regions)
 
   MASTER_NAME = 'SuicuneNouveau'
 
@@ -52,12 +52,12 @@ class DigitalOceanAPI
   RESOURCES.each do |object|
     method_name = object
     define_method(method_name) do
-      location = self.class.const_get(object.upcase << "_URI")
+      location = self.class.const_get(object.upcase << '_URI')
       get_object_from_location(object, location)
     end
     method_name = "#{object[0..-2]}_called"
     define_method(method_name) do |name|
-      named_object(name, self.send(object))
+      named_object(name, send(object))
     end
   end
 
@@ -88,5 +88,4 @@ class DigitalOceanAPI
     response = HTTParty.get uri.to_s
     destroyed_droplet = JSON.parse(response.body)
   end
-
 end
